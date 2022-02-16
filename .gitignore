@@ -1,0 +1,7 @@
+.gradle
+.idea/*
+allure-results/
+build/
+local.properties
+# For sunpower app
+*.apk
