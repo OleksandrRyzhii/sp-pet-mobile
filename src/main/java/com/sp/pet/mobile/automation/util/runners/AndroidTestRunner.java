@@ -1,48 +1,30 @@
 package com.sp.pet.mobile.automation.util.runners;
 
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileElement;
+import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.Selenide;
+import com.sp.pet.mobile.automation.providers.AndroidDriverProvider;
+import io.appium.java_client.service.local.AppiumDriverLocalService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.junit.jupiter.api.BeforeEach;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import static com.sp.pet.mobile.automation.repo.ConfigurationRepo.*;
-import static io.appium.java_client.remote.AndroidMobileCapabilityType.*;
-import static io.appium.java_client.remote.MobileCapabilityType.*;
 import static io.appium.java_client.service.local.AppiumDriverLocalService.buildDefaultService;
-import static org.openqa.selenium.Platform.ANDROID;
-import static org.openqa.selenium.ScreenOrientation.PORTRAIT;
-import static org.openqa.selenium.remote.CapabilityType.PLATFORM_NAME;
 
-public abstract class AndroidTestRunner extends TestRunner {
+public abstract class AndroidTestRunner {
+    protected static AppiumDriverLocalService service;
 
     @BeforeAll
     public static void globalSetUp() {
         service = buildDefaultService();
         service.start();
+        Configuration.timeout = 90000;
+    }
 
-        var capabilities = new DesiredCapabilities();
-        capabilities.setCapability(NEW_COMMAND_TIMEOUT, 300);
-        capabilities.setCapability(ORIENTATION, PORTRAIT);
-        capabilities.setCapability(PLATFORM_NAME, ANDROID);
-        capabilities.setCapability(AUTOMATION_NAME, "UiAutomator2");
-        capabilities.setCapability(APP_PACKAGE, getAppPackage());
-        capabilities.setCapability(APP_ACTIVITY, getAppActivity());
-        capabilities.setCapability("appiumVersion", getAppiumVersion());
-        capabilities.setCapability(DEVICE_NAME, getDeviceName());
-        capabilities.setCapability(PLATFORM_VERSION, getPlatformVersion());
-        capabilities.setCapability(ANDROID_INSTALL_TIMEOUT, "100000");
-        capabilities.setCapability(APP, getAppPath());
-
-        var appiumServerUrl = getAppiumServerUrl();
-        try {
-            DRIVER.set(new AppiumDriver<MobileElement>(new URL(appiumServerUrl), capabilities));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+    @BeforeEach
+    public void setUp() {
+        Configuration.browserSize = null;
+        Configuration.browser = AndroidDriverProvider.class.getName();
+        Selenide.open();
     }
 
     @AfterAll
